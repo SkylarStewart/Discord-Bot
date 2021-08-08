@@ -1,6 +1,8 @@
 import random
 import time
 
+#gives 100 daily points to a user. If the user does not exists, creates a new data entry.
+
 def givePoints(message):
     currentSeconds = int(time.time())
     author = message.author.id
@@ -10,7 +12,6 @@ def givePoints(message):
     gamblingArray = []
     for gambler in gamblers:
         gamblingArray.append(gambler.split(" "))
-
 
     foundGambler = False
     points = 0
@@ -28,6 +29,7 @@ def givePoints(message):
     f.close()
     f = open("gamblers.txt", 'w')
 
+#differentiates between new and returning users (new users require appending to the gamblers array)
     if foundGambler == False:
         points += 100
         gamblers.append(str(message.author.id) + " " + str(points) + " " + str(currentSeconds)+"\n")
@@ -44,8 +46,7 @@ def givePoints(message):
             return [2, points]
 
 
-
-
+#gambles X number of points. If you win, the points are doubled. If you lose, all gambled points are lost.
 
 def gamble(message, pointsGambled):
     author = message.author.id
@@ -72,8 +73,8 @@ def gamble(message, pointsGambled):
             break
 
         lineFound += 1;
-    f.close()
 
+    f.close()
 
     if pointsGambled > points:
         raise AttributeError
@@ -96,6 +97,7 @@ def gamble(message, pointsGambled):
         f.writelines(gamblers)
         return [1, points, pointsGambled]
 
+#checks the balance of a user
 
 def checkBalance(message):
     author = message.author.id
