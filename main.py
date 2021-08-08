@@ -70,7 +70,7 @@ async def on_ready():
 
 
 
-# handles commands and misc. messages
+# handles commands and misc. messages. main event loop for message handling.
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -220,6 +220,8 @@ async def on_message(message):
         except ValueError:
             await message.channel.send('error: city was not located')
 
+    #gambles a certian amount of points (the number that follows the $gamble keyword)
+
     if message.content.startswith('$gamble'):
         try:
             points = gamble(message, int(message.content[8:len(message.content)]))
@@ -238,6 +240,8 @@ async def on_message(message):
         except:
             await message.channel.send("Invalid argument: Please format your message in the form $gamble *points*")
 
+    #claim's a user's 100 daily points
+
     if message.content.startswith('$dailypoints'):
         try:
             points = givePoints(message)
@@ -247,6 +251,8 @@ async def on_message(message):
                 await message.channel.send("Please wait 24 hours before claiming daily points again.")
         except:
             await message.channel.send("Argument error. Please try again using the format $dailypoints")
+
+    #checks a user's balance
 
     if message.content.startswith('$balance'):
         balance = checkBalance(message)
