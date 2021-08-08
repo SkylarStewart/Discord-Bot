@@ -221,12 +221,10 @@ async def on_message(message):
     if message.content.startswith('$gamble'):
         try:
             points = gamble(message, int(message.content[8:len(message.content)]))
-            print("gambled!")
             if points[0] == 0:
                 await message.channel.send("You lost :(")
             if points[0] == 1:
                 await message.channel.send("You won! :D")
-            print("this is the finale...")
             await message.channel.send(message.author.name + " gambled " + str(points[2]) + " points and now has " + str(points[1]) + " points.")
 
         except ValueError:
@@ -250,7 +248,7 @@ async def on_message(message):
 
     #checks a user's balance
 
-    if message.content.startswith('$balance'):
+    if message.content.startswith('$balance') or message.content.startswith('$points'):
         balance = checkBalance(message)
         if balance[0] == 0:
             await message.channel.send("You are not in the gambling system. Please type *$dailypoints* to begin gambling on this server.")
