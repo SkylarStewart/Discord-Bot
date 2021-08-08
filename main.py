@@ -1,8 +1,4 @@
 import discord
-import math
-from discord.ext import commands
-import requests
-import json
 from gambling import gamble, givePoints, random, checkBalance
 from weather import get_weather, configparser, requests
 
