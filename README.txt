@@ -10,8 +10,8 @@ if this is not done, the bot WILL raise errors.
 
 currently uses the following external python libraries:
 
-requests
-discord
+requests (command: pip install requests)
+discord (command: pip install discord)
 
 If you want this bot to have role moderation capabilities, you will have 
 to give it a role one higher than every other user on the discord. This is optional 
