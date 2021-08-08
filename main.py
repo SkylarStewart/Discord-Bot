@@ -1,17 +1,14 @@
 import discord
 import math
 from discord.ext import commands
-import random
 import requests
-import configparser
 import json
+from gambling import gamble, givePoints, random, checkBalance
+from weather import get_weather, configparser, requests
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-
-weather_api_key = config['APIdata']['weather_api_key']
 discord_api_key = config['APIdata']['discord_api_key']
-empty_url = "http://api.openweathermap.org/data/2.5/weather?"
 
 intents = discord.Intents.all()
 intents.members = True
@@ -25,67 +22,6 @@ copyandpastes = file.readlines()
 file = open("jokes.txt")
 jokes = file.readlines()
 jokeSize = len(jokes)
-
-#returns an array in the form [ temperature, pressure, humidity, description, name, country, emoji]
-
-def get_weather(cityName):
-    cityNameCaps = cityName.upper()
-    fullURL = empty_url + "appid=" + weather_api_key + "&q=" + cityName
-    response = requests.get(fullURL)
-
-    #convert into JSON
-    weatherData = response.json()
-
-    #throws an error if the city could not be found in the query
-    if weatherData["cod"] == "404":
-        raise ValueError("error: city was not located")
-    else:
-        tph = weatherData["main"]
-        countrydetails = weatherData["sys"]
-        country = countrydetails["country"]
-        weatherDesc = weatherData["weather"]
-        weatherBase = weatherDesc[0]["main"]
-
-        #a key that maps every single weather description to an emoji for text display
-        weather_key = {
-            "Thunderstorm": ":thunder_cloud_rain:",
-            "Drizzle": ":cloud_rain:",
-            "Rain": ":cloud_rain:",
-            "Snow": ":snowflake:",
-            "Mist": ":fog:",
-            "Smoke": ":fog:",
-            "Haze": ":fog:",
-            "Dust": ":fog:",
-            "Fog": ":fog:",
-            "Sand": ":fog:",
-            "Ash": ":fog:",
-            "Squall": ":dash:",
-            "Tornado": ":cloud_tornado:",
-            "Clear": ":sunny:",
-            "Clouds": ":white_sun_cloud:"
-        }
-
-        #if it is currently nighttime, the weatherEmoji is overridden with a crescent moon
-        weatherEmoji = weather_key[weatherBase]
-        if weatherDesc[0]["icon"][2] == 'n':
-            weatherEmoji = ":crescent_moon:"
-
-        # convert temperature from kelvin to fahrenheit
-        temp = float(tph["temp"])
-        temp = round((((temp - 273.15) * 1.8) + 32), 1)
-        tempString = str(temp)
-
-        weatherArray = []
-        weatherArray.append(tempString)
-        weatherArray.append(str(tph["pressure"]))
-        weatherArray.append(str(tph["humidity"]))
-        weatherArray.append(weatherDesc[0]["description"])
-        weatherArray.append(weatherData["name"])
-        weatherArray.append(country)
-        weatherArray.append(weatherEmoji)
-
-        return weatherArray
-
 
 #returns the guild based off of the input message sent by the user
 
@@ -283,6 +219,43 @@ async def on_message(message):
 
         except ValueError:
             await message.channel.send('error: city was not located')
+
+    if message.content.startswith('$gamble'):
+        try:
+            points = gamble(message, int(message.content[8:len(message.content)]))
+            print("gambled!")
+            if points[0] == 0:
+                await message.channel.send("You lost :(")
+            if points[0] == 1:
+                await message.channel.send("You won! :D")
+            print("this is the finale...")
+            await message.channel.send(message.author.name + " gambled " + str(points[2]) + " points and now has " + str(points[1]) + " points.")
+
+        except ValueError:
+            await message.channel.send("Error: User not found in gambling database")
+        except AttributeError:
+            await message.channel.send("Error: User does not have enough points to gamble")
+        except:
+            await message.channel.send("Invalid argument: Please format your message in the form $gamble *points*")
+
+    if message.content.startswith('$dailypoints'):
+        try:
+            points = givePoints(message)
+            if points[0] == 0 or points[0] == 1:
+                await message.channel.send("100 daily points have been deposited into your account.")
+            if points[0] == 2:
+                await message.channel.send("Please wait 24 hours before claiming daily points again.")
+        except:
+            await message.channel.send("Argument error. Please try again using the format $dailypoints")
+
+    if message.content.startswith('$balance'):
+        balance = checkBalance(message)
+        if balance[0] == 0:
+            await message.channel.send("You are not in the gambling system. Please type *$dailypoints* to begin gambling on this server.")
+        elif balance[0] == 1:
+            await message.channel.send(message.author.name + " currently has " + str(balance[1]) + " points.")
+
+
 
 
 client.run(discord_api_key)
