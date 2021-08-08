@@ -48,7 +48,6 @@ def givePoints(message):
 
 
 def gamble(message, pointsGambled):
-    print(pointsGambled)
     author = message.author.id
     f = open("gamblers.txt")
     gamblers = f.readlines()
