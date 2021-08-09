@@ -1,5 +1,5 @@
 import discord
-from gambling import gamble, givePoints, random, checkBalance
+from gambling import gamble, givePoints, random, checkBalance, leaderboard
 from weather import get_weather, configparser, requests
 
 config = configparser.ConfigParser()
@@ -234,7 +234,7 @@ async def on_message(message):
         except:
             await message.channel.send("Invalid argument: Please format your message in the form $gamble *points*")
 
-    #claim's a user's 100 daily points
+    #claims a user's 100 daily points
 
     if message.content.startswith('$dailypoints'):
         try:
@@ -254,6 +254,18 @@ async def on_message(message):
             await message.channel.send("You are not in the gambling system. Please type *$dailypoints* to begin gambling on this server.")
         elif balance[0] == 1:
             await message.channel.send(message.author.name + " currently has " + str(balance[1]) + " points.")
+
+    if message.content.startswith('$leaderboard'):
+        users = get_server_users(message)
+        winners = ""
+        topGamblers = leaderboard(message, users)
+        i = 1
+        for gamblers in topGamblers:
+            winners += (str(i) + ". " + str(gamblers[0]) + " (points: " + str(gamblers[1]) + ")\n")
+            i += 1
+        await message.channel.send(winners)
+
+
 
 
 

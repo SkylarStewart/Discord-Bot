@@ -118,5 +118,50 @@ def checkBalance(message):
     elif points != -1:
         return [1, points]
 
+#prints out the current top 5 gamblers on the server. if the number is less than 5, prints out all current gamblers.
+
+def leaderboard(message, users):
+
+    f = open("gamblers.txt")
+    gamblers = f.readlines()
+    gamblingArray = []
+    for gambler in gamblers:
+        gamblingArray.append(gambler.split(" "))
+
+    #sorts gamblers
+    for i in range(len(gamblingArray)):
+        current_Low = i
+
+        for j in range(i+1, len(gamblingArray)):
+            if int(gamblingArray[current_Low][1]) < int(gamblingArray[j][1]):
+                current_Low = j
+
+        placeHolder = gamblingArray[i]
+        gamblingArray[i] = gamblingArray[current_Low]
+        gamblingArray[current_Low] = placeHolder
+
+    #produces and returns the top x gamblers (stops at 5)
+
+    returnList = []
+
+    for gamblers in gamblingArray:
+        for user in users:
+            if user.id == int(gamblers[0]):
+                returnList.append([user.name, int(gamblers[1])])
+        if len(returnList) >= 5:
+            break
+    return returnList
+
+
+
+
+
+
+
+
+
+
+
+
 
 
