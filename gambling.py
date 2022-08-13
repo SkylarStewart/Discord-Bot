@@ -1,22 +1,35 @@
 import random
 import time
 
-#gives 100 daily points to a user. If the user does not exists, creates a new data entry.
+#gives 100 daily points to a user. If the user does not exist, creates a new data entry.
 
 def givePoints(message):
     currentSeconds = int(time.time())
     author = message.author.id
     f = open("gamblers.txt")
     gamblers = f.readlines()
+    gamblerCount = 0
 
     gamblingArray = []
     for gambler in gamblers:
         gamblingArray.append(gambler.split(" "))
+        gamblerCount+=1
+
+
 
     foundGambler = False
     points = 0
     lineFound = 0
     currentTime = 0
+
+    f.close()
+    f = open("gamblers.txt", 'w')
+
+    if gamblerCount == 0:
+        points += 100
+        gamblers.append(str(message.author.id) + " " + str(points) + " " + str(currentSeconds)+"\n")
+        f.writelines(gamblers)
+        return [0, points]
 
     for gambler in gamblingArray:
         if author == int(gambler[0]):
@@ -26,8 +39,6 @@ def givePoints(message):
             break
 
         lineFound += 1;
-    f.close()
-    f = open("gamblers.txt", 'w')
 
 #differentiates between new and returning users (new users require appending to the gamblers array)
     if foundGambler == False:
@@ -121,7 +132,7 @@ def checkBalance(message):
 #prints out the current top 5 gamblers on the server. if the number is less than 5, prints out all current gamblers.
 
 def leaderboard(message, users):
-
+    print("ran this!")
     f = open("gamblers.txt")
     gamblers = f.readlines()
     gamblingArray = []
@@ -145,11 +156,14 @@ def leaderboard(message, users):
     returnList = []
 
     for gamblers in gamblingArray:
+        print("was a gambler.")
         for user in users:
             if user.id == int(gamblers[0]):
+                print("was a user!")
                 returnList.append([user.name, int(gamblers[1])])
         if len(returnList) >= 5:
             break
+    print(returnList)
     return returnList
 
 
